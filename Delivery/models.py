@@ -22,3 +22,11 @@ class Item(models.Model):
     description = models.CharField(max_length = 200)
     price = models.FloatField()
     is_veg = models.BooleanField(default = True)
+
+
+class Cart(models.Model):
+    customer = models.ForeignKey(Customer, on_delete = models.CASCADE, related_name = "cart")
+    items = models.ManyToManyField("Item", related_name = "carts")
+
+    def total_price(self):
+        return sum(item.price for item in self.items.all())

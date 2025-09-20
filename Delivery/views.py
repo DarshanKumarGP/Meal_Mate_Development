@@ -3,6 +3,10 @@ from . models import Customer, Item
 from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponse
 from . models import Restaurant
+from . models import Cart
+
+import razorpay
+from django.conf import settings
 
 # Create your views here.
 def index(request):
@@ -158,3 +162,77 @@ def view_menu(request, restaurant_id, username):
                   ,{"itemList" : itemList,
                      "restaurant" : restaurant, 
                      "username": username})
+
+
+def add_to_cart(request, item_id, username):
+    item = Item.objects.get(id = item_id)
+    customer = Customer.objects.get(username = username)
+
+    cart, created = Cart.objects.get_or_create(customer = customer)
+
+    cart.items.add(item)
+
+    return HttpResponse('added to cart')
+
+
+def show_cart(request, username):
+    customer = Customer.objects.get(username = username)
+    cart = Cart.objects.filter(customer=customer).first()
+    items = cart.items.all() if cart else []
+    total_price = cart.total_price() if cart else 0
+
+    return render(request, 'cart.html',{"itemList" : items, "total_price" : total_price, "username":username})
+
+
+# Checkout View
+def checkout(request, username):
+    # Fetch customer and their cart
+    customer = get_object_or_404(Customer, username=username)
+    cart = Cart.objects.filter(customer=customer).first()
+    cart_items = cart.items.all() if cart else []
+    total_price = cart.total_price() if cart else 0
+
+    if total_price == 0:
+        return render(request, 'checkout.html', {
+            'error': 'Your cart is empty!',
+        })
+
+    # Initialize Razorpay client
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+    # Create Razorpay order
+    order_data = {
+        'amount': int(total_price * 100),  # Amount in paisa
+        'currency': 'INR',
+        'payment_capture': '1',  # Automatically capture payment
+    }
+    order = client.order.create(data=order_data)
+
+    # Pass the order details to the frontend
+    return render(request, 'checkout.html', {
+        'username': username,
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'order_id': order['id'],  # Razorpay order ID
+        'amount': total_price,
+    })
+
+def orders(request, username):
+    customer = get_object_or_404(Customer, username=username)
+    cart = Cart.objects.filter(customer=customer).first()
+
+    # Fetch cart items and total price before clearing the cart
+    cart_items = cart.items.all() if cart else []
+    total_price = cart.total_price() if cart else 0
+
+    # Clear the cart after fetching its details
+    if cart:
+        cart.items.clear()
+
+    return render(request, 'orders.html', {
+        'username': username,
+        'customer': customer,
+        'cart_items': cart_items,
+        'total_price': total_price,
+    })

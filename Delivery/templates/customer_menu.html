@@ -8,6 +8,9 @@
     <title>{{ restaurant.name }} - Menu</title>
 </head>
 <body>
+    <h3>Welcome {{username}}</h3>
+
+    <a href="{% url 'show_cart' username %}" >Go to cart</a>
 
     <!-- Display menu Item -->
      <h1>Menu for {{ restaurant.name }}</h1>
@@ -43,7 +46,7 @@
                     {% endif %}
                 </td> 
                 <td>
-                    <a href="#">Add to cart</a>
+                    <a href= "{% url 'add_to_cart' item.id username %}">Add to cart</a>
                 </td>
             </tr>
             {% empty %}
