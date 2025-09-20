@@ -6,7 +6,7 @@
     <title>Customer Page</title>
 </head>
 <body>
-    <h1>Welcome Customer</h1>
+    <h1>Welcome {{username}}</h1>
 
     <h2>All Restaurants</h2>
     <table border="1">
@@ -29,7 +29,7 @@
                 <td>{{ restaurant.cuisine }}</td>
                 <td>{{ restaurant.rating }}/5</td>
                 <td>
-                    <form action="{% url 'view_menu' restaurant.id %}" method="get">
+                    <form action="{% url 'view_menu' restaurant.id username %}" method="get">
                         <button type="submit">View Menu</button>
                     </form>
                 </td>

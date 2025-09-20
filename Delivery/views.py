@@ -53,7 +53,7 @@ def signin(request):
             else:
                 # fetch all restaurants for customer home page
                 restaurants = Restaurant.objects.all()
-                return render(request, "customer_home.html", {"restaurants": restaurants})
+                return render(request, "customer_home.html", {"restaurants": restaurants, "username" : username})
 
         except Customer.DoesNotExist:
             # invalid login
@@ -150,8 +150,11 @@ def update_menu(request,restaurant_id ):
         return redirect('open_show_restaurant')
     
 
-def view_menu(request, restaurant_id):
-    restaurant = Restaurant.objects.get( id=restaurant_id)
-    # itemList = Item.objects.all()
+def view_menu(request, restaurant_id, username):
+    restaurant = Restaurant.objects.get(id = restaurant_id)
     itemList = restaurant.items.all()
-    return render(request, 'customer_menu.html', {"itemList": itemList, "restaurant": restaurant}) 
+    #itemList = Item.objects.all()
+    return render(request, 'customer_menu.html'
+                  ,{"itemList" : itemList,
+                     "restaurant" : restaurant, 
+                     "username": username})

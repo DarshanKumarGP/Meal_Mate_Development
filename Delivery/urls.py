@@ -4,8 +4,8 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.index),
-    path('open_signIn', views.open_signIn, name='open_signIn'),
+     path('', views.index),
+     path('open_signIn', views.open_signIn, name='open_signIn'),
      path('open_signUp', views.open_signUp, name='open_signUp'),
      path('signup/', views.signup, name='signup'),
      path('signin/', views.signin, name='signin'),
@@ -17,7 +17,7 @@ urlpatterns = [
      path('delete_restaurant/<int:restaurant_id>',views.delete_restaurant,name="delete_restaurant"),    
      path('open_update_menu/<int:restaurant_id>', views.open_update_menu, name='open_update_menu'),
      path('update_menu/<int:restaurant_id>',views.update_menu,name='update_menu'),
-    path('view_menu/<int:restaurant_id>',views.view_menu,name='view_menu'),  
+     path('view_menu/<int:restaurant_id>/<str:username>/', views.view_menu, name='view_menu'), 
 
 
 ]
